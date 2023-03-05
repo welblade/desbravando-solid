@@ -1,11 +1,14 @@
-package cotuba;
+package cotuba.epub;
 
+import cotuba.domain.Capitulo;
+import cotuba.domain.Ebook;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.epub.EpubWriter;
 import nl.siegmann.epublib.service.MediatypeService;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 public class GeradorEPUB {
@@ -13,14 +16,17 @@ public class GeradorEPUB {
         var arquivoDeSaida = ebook.getArquivoDeSaida();
         var epub = new Book();
 
-        for (Capitulo capitulo: ebook.getCapitulos()) {
-            var html = capitulo.getConteudoHTML();
-            var tituloCapitulo = capitulo.getTitulo();
+        for (Capitulo capitulo : ebook.getCapitulos()) {
 
-            epub.addSection(tituloCapitulo, new Resource(html.getBytes(), MediatypeService.XHTML));
+            String html = capitulo.getConteudoHTML();
+
+            String tituloDoCapitulo = capitulo.getTitulo();
+            epub.addSection(tituloDoCapitulo,
+                    new Resource(html.getBytes(StandardCharsets.UTF_8), MediatypeService.XHTML));
         }
 
         var epubWriter = new EpubWriter();
+
         try {
             epubWriter.write(epub, Files.newOutputStream(arquivoDeSaida));
         } catch (IOException ex) {
